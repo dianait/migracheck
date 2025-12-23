@@ -1,11 +1,11 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { MigraineContext } from '../context/MigraineContext';
 import { getYearlyData } from '../utils/chartData';
-import { format, startOfYear, addYears, subYears, isSameYear } from 'date-fns';
+import { format, addYears, subYears, isSameYear } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export const YearlyChart: React.FC = () => {
+export const YearlyChart = () => {
     const { state } = useContext(MigraineContext);
     const [currentYear, setCurrentYear] = useState(new Date());
     const today = new Date();

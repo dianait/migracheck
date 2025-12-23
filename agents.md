@@ -25,8 +25,12 @@
 - Tests must pass before committing code
 
 ### Git Workflow
-- **Husky pre-commit hooks** - Tests and linting must run automatically before every commit
-- If tests fail or linting errors exist, the commit will be blocked
+- **Husky pre-commit hooks** - All tests (unit and E2E) and linting must run automatically before every commit
+- The pre-commit hook executes in this order:
+  1. Unit tests (`npm run test`)
+  2. E2E tests (`npm run test:e2e`)
+  3. Linting on staged files (`lint-staged`)
+- If any tests fail or linting errors exist, the commit will be blocked
 - Fix all issues before committing
 
 ### Code Structure

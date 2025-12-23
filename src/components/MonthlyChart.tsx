@@ -1,16 +1,14 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { MigraineContext } from '../context/MigraineContext';
 import { getMonthlyData } from '../utils/chartData';
-import { format, startOfMonth, addMonths, subMonths, isSameMonth } from 'date-fns';
+import { format, addMonths, subMonths, isSameMonth } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { getIntensityColor } from '../utils/colors';
 
-export const MonthlyChart: React.FC = () => {
+export const MonthlyChart = () => {
     const { state } = useContext(MigraineContext);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const today = new Date();
-    const currentMonthStart = startOfMonth(today);
     const isCurrentOrFutureMonth = isSameMonth(currentMonth, today) || currentMonth > today;
 
     const monthlyData = getMonthlyData(state.entries, currentMonth);

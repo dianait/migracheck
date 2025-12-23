@@ -1,4 +1,3 @@
-import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { type MigraineEntry } from '../types/migraine';
@@ -12,11 +11,8 @@ interface DayCellProps {
     isToday?: boolean;
 }
 
-export const DayCell: React.FC<DayCellProps> = ({ day, date, entry, onClick, isToday }) => {
+export const DayCell = ({ day, date, entry, onClick, isToday }: DayCellProps) => {
     const intensity = entry?.intensity ?? 0;
-    // If no entry, we don't show intensity color, just a neutral one or none?
-    // User asked for "modern". Let's wait for user input on interaction but for now basic render.
-
     const hasEntry = entry !== undefined;
     const colorClass = hasEntry ? getIntensityColor(intensity) : 'bg-white hover:bg-gray-50 border-gray-100';
 

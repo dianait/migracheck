@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, format, isSameMonth, isToday, addMonths, subMonths } from 'date-fns';
 import { MigraineContext } from '../context/MigraineContext';
 import { DayCell } from './DayCell';
@@ -8,11 +8,10 @@ interface CalendarProps {
     onDayClick: (date: string) => void;
 }
 
-export const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
+export const Calendar = ({ onDayClick }: CalendarProps) => {
     const { state } = useContext(MigraineContext);
     const [currentDate, setCurrentDate] = useState(new Date());
     const today = new Date();
-    const currentMonthStart = startOfMonth(today);
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);

@@ -3,7 +3,7 @@ import { type MigraineState, type MigraineAction } from '../types/migraine';
 
 const STORAGE_KEY = 'migracheck-entries';
 
-// Función para cargar el estado desde localStorage
+// Function to load state from localStorage
 function loadStateFromStorage(): MigraineState {
     try {
         const storedData = localStorage.getItem(STORAGE_KEY);
@@ -16,7 +16,7 @@ function loadStateFromStorage(): MigraineState {
     return { entries: {} };
 }
 
-// Función para guardar el estado en localStorage
+// Function to save state to localStorage
 function saveStateToStorage(state: MigraineState): void {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -59,7 +59,7 @@ export const MigraineContext = createContext<{
 export const MigraineProvider = ({ children }: { children: ReactNode }) => {
     const [state, dispatch] = useReducer(migraineReducer, initialState);
 
-    // Guardar en localStorage cada vez que el estado cambie
+    // Save to localStorage whenever state changes
     useEffect(() => {
         saveStateToStorage(state);
     }, [state]);

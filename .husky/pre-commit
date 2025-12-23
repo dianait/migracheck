@@ -1,1 +1,19 @@
+# Run all tests before commit
+echo "Running unit tests..."
+npm run test
+
+if [ $? -ne 0 ]; then
+  echo "❌ Unit tests failed. Commit aborted."
+  exit 1
+fi
+
+echo "Running E2E tests..."
+npm run test:e2e
+
+if [ $? -ne 0 ]; then
+  echo "❌ E2E tests failed. Commit aborted."
+  exit 1
+fi
+
+echo "✅ All tests passed. Running lint-staged..."
 npx lint-staged

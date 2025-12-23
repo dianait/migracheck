@@ -23,7 +23,7 @@ export interface MonthlyDataPoint {
  */
 export function getMonthlyData(entries: Record<string, MigraineEntry>, monthDate: Date): DailyDataPoint[] {
     const monthStart = startOfMonth(monthDate);
-    const monthEnd = endOfMonth(monthDate);
+    const monthEnd = endOfMonth(monthStart);
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
     return days.map((day) => {

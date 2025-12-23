@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react';
+import { useReducer, useEffect } from 'react';
 import { type Intensity, type MigraineEntry } from '../types/migraine';
 import { getIntensityColor } from '../utils/colors';
 import { X } from 'lucide-react';
@@ -72,7 +72,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
     }
 }
 
-export const EntryModal: React.FC<EntryModalProps> = ({ isOpen, onClose, onSave, date, existingEntry }) => {
+export const EntryModal = ({ isOpen, onClose, onSave, date, existingEntry }: EntryModalProps) => {
     const [formState, dispatch] = useReducer(formReducer, initialFormState);
 
     // Reset state when modal opens or entry changes

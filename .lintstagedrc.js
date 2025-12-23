@@ -1,3 +1,3 @@
 export default {
-    '*.{ts,tsx}': ['eslint --fix', 'vitest run'],
+    '*.{ts,tsx}': ['eslint --fix'],
 }

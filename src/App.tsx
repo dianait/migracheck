@@ -1,13 +1,21 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, Suspense, lazy } from 'react';
 import { Calendar } from './components/Calendar';
 import { EntryModal } from './components/EntryModal';
-import { MonthlyChart } from './components/MonthlyChart';
-import { YearlyChart } from './components/YearlyChart';
 import { MigraineContext } from './context/MigraineContext';
 import { type MigraineEntry } from './types/migraine';
 import { Calendar as CalendarIcon, BarChart3, TrendingUp } from 'lucide-react';
 
+// Lazy load chart components for code splitting
+const MonthlyChart = lazy(() => import('./components/MonthlyChart').then(module => ({ default: module.MonthlyChart })));
+const YearlyChart = lazy(() => import('./components/YearlyChart').then(module => ({ default: module.YearlyChart })));
+
 type ViewType = 'calendar' | 'monthly' | 'yearly';
+
+const ChartLoader = () => (
+  <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 flex items-center justify-center min-h-[400px]">
+    <div className="text-gray-500">Loading chart...</div>
+  </div>
+);
 
 export default function App() {
   const { state, dispatch } = useContext(MigraineContext);
@@ -40,9 +48,17 @@ export default function App() {
       case 'calendar':
         return <Calendar onDayClick={handleDayClick} />;
       case 'monthly':
-        return <MonthlyChart />;
+        return (
+          <Suspense fallback={<ChartLoader />}>
+            <MonthlyChart />
+          </Suspense>
+        );
       case 'yearly':
-        return <YearlyChart />;
+        return (
+          <Suspense fallback={<ChartLoader />}>
+            <YearlyChart />
+          </Suspense>
+        );
       default:
         return <Calendar onDayClick={handleDayClick} />;
     }

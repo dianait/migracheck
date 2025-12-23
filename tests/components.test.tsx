@@ -2,7 +2,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DayCell } from '../src/components/DayCell';
 import { EntryModal } from '../src/components/EntryModal';
+import { MonthlyChart } from '../src/components/MonthlyChart';
+import { YearlyChart } from '../src/components/YearlyChart';
+import App from '../src/App';
 import { type MigraineEntry } from '../src/types/migraine';
+import { getMonthlyData, getYearlyData } from '../src/utils/chartData';
+import { MigraineProvider } from '../src/context/MigraineContext';
 
 describe('DayCell', () => {
     describe('Indicator emoji display', () => {
@@ -722,5 +727,390 @@ describe('EntryModal', () => {
             expect(stressButton).toHaveClass('bg-gray-50'); // Now inactive
             expect(weatherButton).toHaveClass('bg-cyan-50'); // Now active
         });
+    });
+});
+
+describe('chartData utilities', () => {
+    describe('getMonthlyData', () => {
+        it('correctly processes migraine entries for a given month', () => {
+            const entries: Record<string, MigraineEntry> = {
+                '2024-01-05': {
+                    id: '1',
+                    date: '2024-01-05',
+                    intensity: 7,
+                    medicationCount: 2,
+                },
+                '2024-01-10': {
+                    id: '2',
+                    date: '2024-01-10',
+                    intensity: 5,
+                    medicationCount: 1,
+                },
+                '2024-01-15': {
+                    id: '3',
+                    date: '2024-01-15',
+                    intensity: 8,
+                    medicationCount: 3,
+                },
+            };
+
+            const monthDate = new Date('2024-01-15');
+            const result = getMonthlyData(entries, monthDate);
+
+            // Should have 31 days for January
+            expect(result).toHaveLength(31);
+
+            // Check day 5
+            const day5 = result.find((d) => d.day === 5);
+            expect(day5).toBeDefined();
+            expect(day5?.intensity).toBe(7);
+            expect(day5?.medicationCount).toBe(2);
+            expect(day5?.hasEntry).toBe(true);
+            expect(day5?.date).toBe('2024-01-05');
+
+            // Check day 10
+            const day10 = result.find((d) => d.day === 10);
+            expect(day10?.intensity).toBe(5);
+            expect(day10?.medicationCount).toBe(1);
+            expect(day10?.hasEntry).toBe(true);
+
+            // Check day 15
+            const day15 = result.find((d) => d.day === 15);
+            expect(day15?.intensity).toBe(8);
+            expect(day15?.medicationCount).toBe(3);
+            expect(day15?.hasEntry).toBe(true);
+
+            // Check a day without entry
+            const day1 = result.find((d) => d.day === 1);
+            expect(day1?.intensity).toBe(0);
+            expect(day1?.medicationCount).toBe(0);
+            expect(day1?.hasEntry).toBe(false);
+        });
+
+        it('handles a month with no entries', () => {
+            const entries: Record<string, MigraineEntry> = {};
+            const monthDate = new Date('2024-02-15');
+            const result = getMonthlyData(entries, monthDate);
+
+            // February 2024 has 29 days (leap year)
+            expect(result).toHaveLength(29);
+
+            // All days should have default values
+            result.forEach((day) => {
+                expect(day.intensity).toBe(0);
+                expect(day.medicationCount).toBe(0);
+                expect(day.hasEntry).toBe(false);
+            });
+        });
+
+        it('calculates intensity and medication counts correctly', () => {
+            const entries: Record<string, MigraineEntry> = {
+                '2024-03-01': { id: '1', date: '2024-03-01', intensity: 0, medicationCount: 0 },
+                '2024-03-02': { id: '2', date: '2024-03-02', intensity: 10, medicationCount: 5 },
+                '2024-03-03': { id: '3', date: '2024-03-03', intensity: 3, medicationCount: undefined },
+            };
+
+            const result = getMonthlyData(entries, new Date('2024-03-01'));
+
+            const day1 = result.find((d) => d.day === 1);
+            expect(day1?.intensity).toBe(0);
+            expect(day1?.medicationCount).toBe(0);
+
+            const day2 = result.find((d) => d.day === 2);
+            expect(day2?.intensity).toBe(10);
+            expect(day2?.medicationCount).toBe(5);
+
+            const day3 = result.find((d) => d.day === 3);
+            expect(day3?.intensity).toBe(3);
+            expect(day3?.medicationCount).toBe(0); // undefined should default to 0
+        });
+    });
+
+    describe('getYearlyData', () => {
+        it('correctly aggregates migraine entries by month for a given year', () => {
+            const entries: Record<string, MigraineEntry> = {
+                '2024-01-05': { id: '1', date: '2024-01-05', intensity: 6, medicationCount: 2 },
+                '2024-01-10': { id: '2', date: '2024-01-10', intensity: 8, medicationCount: 1 },
+                '2024-02-15': { id: '3', date: '2024-02-15', intensity: 4, medicationCount: 3 },
+                '2024-03-20': { id: '4', date: '2024-03-20', intensity: 7, medicationCount: 2 },
+                '2024-03-25': { id: '5', date: '2024-03-25', intensity: 9, medicationCount: 1 },
+            };
+
+            const yearDate = new Date('2024-06-15');
+            const result = getYearlyData(entries, yearDate);
+
+            // Should have 12 months
+            expect(result).toHaveLength(12);
+
+            // Check January (2 entries: intensity 6 and 8, avg = 7)
+            const january = result[0];
+            expect(january.month).toBe('Jan');
+            expect(january.monthNumber).toBe(0);
+            expect(january.daysWithMigraines).toBe(2);
+            expect(january.averageIntensity).toBe(7); // (6 + 8) / 2 = 7
+            expect(january.totalMedication).toBe(3); // 2 + 1
+            expect(january.totalDays).toBe(31);
+
+            // Check February (1 entry: intensity 4)
+            const february = result[1];
+            expect(february.month).toBe('Feb');
+            expect(february.daysWithMigraines).toBe(1);
+            expect(february.averageIntensity).toBe(4);
+            expect(february.totalMedication).toBe(3);
+            expect(february.totalDays).toBe(29); // 2024 is a leap year
+
+            // Check March (2 entries: intensity 7 and 9, avg = 8)
+            const march = result[2];
+            expect(march.month).toBe('Mar');
+            expect(march.daysWithMigraines).toBe(2);
+            expect(march.averageIntensity).toBe(8); // (7 + 9) / 2 = 8
+            expect(march.totalMedication).toBe(3); // 2 + 1
+
+            // Check a month with no entries (April)
+            const april = result[3];
+            expect(april.month).toBe('Apr');
+            expect(april.daysWithMigraines).toBe(0);
+            expect(april.averageIntensity).toBe(0);
+            expect(april.totalMedication).toBe(0);
+            expect(april.totalDays).toBe(30);
+        });
+
+        it('handles a year with no entries', () => {
+            const entries: Record<string, MigraineEntry> = {};
+            const result = getYearlyData(entries, new Date('2024-01-01'));
+
+            expect(result).toHaveLength(12);
+
+            result.forEach((month) => {
+                expect(month.daysWithMigraines).toBe(0);
+                expect(month.averageIntensity).toBe(0);
+                expect(month.totalMedication).toBe(0);
+                expect(month.totalDays).toBeGreaterThan(0);
+            });
+        });
+
+        it('rounds average intensity correctly', () => {
+            const entries: Record<string, MigraineEntry> = {
+                '2024-01-01': { id: '1', date: '2024-01-01', intensity: 3, medicationCount: 0 },
+                '2024-01-02': { id: '2', date: '2024-01-02', intensity: 4, medicationCount: 0 },
+                '2024-01-03': { id: '3', date: '2024-01-03', intensity: 5, medicationCount: 0 },
+            };
+
+            const result = getYearlyData(entries, new Date('2024-01-01'));
+            const january = result[0];
+
+            // (3 + 4 + 5) / 3 = 4.0
+            expect(january.averageIntensity).toBe(4);
+        });
+
+        it('handles entries with undefined medication count', () => {
+            const entries: Record<string, MigraineEntry> = {
+                '2024-01-01': { id: '1', date: '2024-01-01', intensity: 5, medicationCount: undefined },
+                '2024-01-02': { id: '2', date: '2024-01-02', intensity: 6, medicationCount: 2 },
+            };
+
+            const result = getYearlyData(entries, new Date('2024-01-01'));
+            const january = result[0];
+
+            expect(january.totalMedication).toBe(2); // undefined should be treated as 0
+        });
+    });
+});
+
+describe('MonthlyChart', () => {
+    it('displays correct monthly statistics based on provided data', () => {
+        const mockEntries: Record<string, MigraineEntry> = {
+            '2024-01-05': { id: '1', date: '2024-01-05', intensity: 7, medicationCount: 2 },
+            '2024-01-10': { id: '2', date: '2024-01-10', intensity: 5, medicationCount: 1 },
+            '2024-01-20': { id: '3', date: '2024-01-20', intensity: 8, medicationCount: 3 },
+        };
+
+        // Mock the context
+        const mockContext = {
+            state: { entries: mockEntries },
+            dispatch: vi.fn(),
+        };
+
+        // We need to mock the useContext hook
+        const originalUseContext = require('react').useContext;
+        vi.spyOn(require('react'), 'useContext').mockImplementation((context: any) => {
+            if (context.displayName === 'MigraineContext' || context === require('../src/context/MigraineContext').MigraineContext) {
+                return mockContext;
+            }
+            return originalUseContext(context);
+        });
+
+        // Mock date to be in January 2024
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2024-01-15'));
+
+        render(<MonthlyChart />);
+
+        // Check that the correct statistics are displayed
+        // Days with migraines: 3
+        expect(screen.getByText('Days with Migraines')).toBeInTheDocument();
+        expect(screen.getByText('3')).toBeInTheDocument();
+
+        // Average intensity: (7 + 5 + 8) / 3 = 6.7 (rounded to 6.7)
+        expect(screen.getByText('Average Intensity')).toBeInTheDocument();
+        expect(screen.getByText('6.7')).toBeInTheDocument();
+
+        // Total medication: 2 + 1 + 3 = 6
+        expect(screen.getByText('Total Medication')).toBeInTheDocument();
+        expect(screen.getByText('6')).toBeInTheDocument();
+
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+    });
+
+    it('displays zero statistics when there are no entries', () => {
+        const mockContext = {
+            state: { entries: {} },
+            dispatch: vi.fn(),
+        };
+
+        const originalUseContext = require('react').useContext;
+        vi.spyOn(require('react'), 'useContext').mockImplementation((context: any) => {
+            if (context.displayName === 'MigraineContext' || context === require('../src/context/MigraineContext').MigraineContext) {
+                return mockContext;
+            }
+            return originalUseContext(context);
+        });
+
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2024-02-15'));
+
+        render(<MonthlyChart />);
+
+        // All statistics should be 0
+        const allZeros = screen.getAllByText('0');
+        expect(allZeros.length).toBeGreaterThanOrEqual(3);
+
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+    });
+});
+
+describe('YearlyChart', () => {
+    it('displays correct yearly statistics based on provided data', () => {
+        const mockEntries: Record<string, MigraineEntry> = {
+            '2024-01-05': { id: '1', date: '2024-01-05', intensity: 6, medicationCount: 2 },
+            '2024-01-10': { id: '2', date: '2024-01-10', intensity: 8, medicationCount: 1 },
+            '2024-02-15': { id: '3', date: '2024-02-15', intensity: 4, medicationCount: 3 },
+            '2024-03-20': { id: '4', date: '2024-03-20', intensity: 7, medicationCount: 2 },
+            '2024-03-25': { id: '5', date: '2024-03-25', intensity: 9, medicationCount: 1 },
+        };
+
+        const mockContext = {
+            state: { entries: mockEntries },
+            dispatch: vi.fn(),
+        };
+
+        const originalUseContext = require('react').useContext;
+        vi.spyOn(require('react'), 'useContext').mockImplementation((context: any) => {
+            if (context.displayName === 'MigraineContext' || context === require('../src/context/MigraineContext').MigraineContext) {
+                return mockContext;
+            }
+            return originalUseContext(context);
+        });
+
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2024-06-15'));
+
+        render(<YearlyChart />);
+
+        // Total days with migraines: 5 (2 in Jan, 1 in Feb, 2 in Mar)
+        expect(screen.getByText('Total Days')).toBeInTheDocument();
+        expect(screen.getByText('5')).toBeInTheDocument();
+
+        // Average monthly intensity: (7 + 4 + 8) / 12 = 1.6 (rounded)
+        // Jan: (6+8)/2=7, Feb: 4, Mar: (7+9)/2=8, others: 0
+        // (7 + 4 + 8 + 0*9) / 12 = 1.6
+        expect(screen.getByText('Avg Monthly Intensity')).toBeInTheDocument();
+        expect(screen.getByText('1.6')).toBeInTheDocument();
+
+        // Total medication: 2 + 1 + 3 + 2 + 1 = 9
+        expect(screen.getByText('Total Medication')).toBeInTheDocument();
+        expect(screen.getByText('9')).toBeInTheDocument();
+
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+    });
+
+    it('displays zero statistics when there are no entries', () => {
+        const mockContext = {
+            state: { entries: {} },
+            dispatch: vi.fn(),
+        };
+
+        const originalUseContext = require('react').useContext;
+        vi.spyOn(require('react'), 'useContext').mockImplementation((context: any) => {
+            if (context.displayName === 'MigraineContext' || context === require('../src/context/MigraineContext').MigraineContext) {
+                return mockContext;
+            }
+            return originalUseContext(context);
+        });
+
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2024-06-15'));
+
+        render(<YearlyChart />);
+
+        // All statistics should be 0
+        const allZeros = screen.getAllByText('0');
+        expect(allZeros.length).toBeGreaterThanOrEqual(3);
+
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+    });
+});
+
+describe('App component view switching', () => {
+    it('correctly switches between Calendar, MonthlyChart, and YearlyChart views', () => {
+        render(
+            <MigraineProvider>
+                <App />
+            </MigraineProvider>
+        );
+
+        // Initially, Calendar view should be active
+        const calendarButton = screen.getByRole('button', { name: /calendar/i });
+        const monthlyButton = screen.getByRole('button', { name: /monthly/i });
+        const yearlyButton = screen.getByRole('button', { name: /yearly/i });
+
+        // Check that calendar button is active (has the active border class)
+        expect(calendarButton).toHaveClass('border-indigo-600');
+        expect(monthlyButton).not.toHaveClass('border-indigo-600');
+        expect(yearlyButton).not.toHaveClass('border-indigo-600');
+
+        // Click Monthly button
+        fireEvent.click(monthlyButton);
+
+        // Monthly view should now be active
+        expect(calendarButton).not.toHaveClass('border-indigo-600');
+        expect(monthlyButton).toHaveClass('border-indigo-600');
+        expect(yearlyButton).not.toHaveClass('border-indigo-600');
+
+        // Should display monthly statistics heading
+        expect(screen.getByText('Monthly Statistics')).toBeInTheDocument();
+
+        // Click Yearly button
+        fireEvent.click(yearlyButton);
+
+        // Yearly view should now be active
+        expect(calendarButton).not.toHaveClass('border-indigo-600');
+        expect(monthlyButton).not.toHaveClass('border-indigo-600');
+        expect(yearlyButton).toHaveClass('border-indigo-600');
+
+        // Should display yearly statistics heading
+        expect(screen.getByText('Yearly Statistics')).toBeInTheDocument();
+
+        // Click Calendar button to go back
+        fireEvent.click(calendarButton);
+
+        // Calendar view should be active again
+        expect(calendarButton).toHaveClass('border-indigo-600');
+        expect(monthlyButton).not.toHaveClass('border-indigo-600');
+        expect(yearlyButton).not.toHaveClass('border-indigo-600');
     });
 });
