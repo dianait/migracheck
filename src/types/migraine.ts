@@ -5,6 +5,7 @@ export interface MigraineEntry {
     date: string; // ISO date string YYYY-MM-DD
     intensity: Intensity;
     notes?: string;
+    medicationCount?: number; // Número de píldoras tomadas (0, 1, 2, etc.)
 }
 
 export interface MigraineState {

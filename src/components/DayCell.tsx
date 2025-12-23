@@ -35,11 +35,28 @@ export const DayCell: React.FC<DayCellProps> = ({ day, date, entry, onClick, isT
             )}>
                 {day}
             </span>
-            {hasEntry && (
-                <span className="text-xs font-semibold self-end">
-                    Lvl {intensity}
-                </span>
-            )}
+            <div className="flex flex-col items-end gap-1 w-full">
+                {hasEntry && (
+                    <span className="text-xs font-semibold">
+                        Lvl {intensity}
+                    </span>
+                )}
+                {entry?.medicationCount && entry.medicationCount > 0 && (
+                    <div 
+                        className="flex flex-row items-center justify-center gap-0.5"
+                        title={`${entry.medicationCount} píldora${entry.medicationCount > 1 ? 's' : ''}`}
+                    >
+                        {entry.medicationCount === 1 ? (
+                            <span className="text-sm">💊</span>
+                        ) : (
+                            <>
+                                <span className="text-sm">💊</span>
+                                <span className="text-sm">💊</span>
+                            </>
+                        )}
+                    </div>
+                )}
+            </div>
         </button>
     );
 };

@@ -14,12 +14,14 @@ interface EntryModalProps {
 export const EntryModal: React.FC<EntryModalProps> = ({ isOpen, onClose, onSave, date, existingEntry }) => {
     const [intensity, setIntensity] = useState<Intensity>(0);
     const [notes, setNotes] = useState('');
+    const [medicationCount, setMedicationCount] = useState<number>(0);
 
     // Reset state when modal opens or entry changes
     useEffect(() => {
         if (isOpen) {
             setIntensity(existingEntry?.intensity ?? 0);
             setNotes(existingEntry?.notes ?? '');
+            setMedicationCount(existingEntry?.medicationCount ?? 0);
         }
     }, [isOpen, existingEntry]);
 
@@ -27,7 +29,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({ isOpen, onClose, onSave,
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ date, intensity, notes });
+        onSave({ date, intensity, notes, medicationCount: medicationCount > 0 ? medicationCount : undefined });
         onClose();
     };
 
@@ -61,6 +63,31 @@ export const EntryModal: React.FC<EntryModalProps> = ({ isOpen, onClose, onSave,
                                     {level}
                                 </button>
                             ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Medicación 💊</label>
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm text-gray-600">Cantidad:</span>
+                            <div className="flex gap-2">
+                                {[0, 1, 2].map((count) => (
+                                    <button
+                                        key={count}
+                                        type="button"
+                                        onClick={() => setMedicationCount(count)}
+                                        className={`
+                                            w-20 h-12 rounded-lg font-medium text-lg transition-all duration-150 flex items-center justify-center
+                                            ${medicationCount === count 
+                                                ? 'bg-indigo-600 text-white ring-2 ring-indigo-500 ring-offset-2 scale-110 shadow-md' 
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-105'
+                                            }
+                                        `}
+                                    >
+                                        {count === 0 ? '—' : '💊'.repeat(count)}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
