@@ -94,7 +94,17 @@ export const EntryModal = ({ isOpen, onClose, onSave, date, existingEntry }: Ent
                     weather: existingEntry?.weather ?? false,
                 },
             });
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Restore body scroll when modal is closed
+            document.body.style.overflow = 'unset';
         }
+
+        // Cleanup function to restore scroll when component unmounts
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
     }, [isOpen, existingEntry]);
 
     if (!isOpen) return null;
@@ -119,9 +129,17 @@ export const EntryModal = ({ isOpen, onClose, onSave, date, existingEntry }: Ent
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-[fadeIn_0.2s_ease-in-out]">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-[fadeInZoom_0.2s_ease-in-out]">
-                <div className="flex items-center justify-between p-4 border-b">
+        <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-[fadeIn_0.2s_ease-in-out] overflow-y-auto"
+            onClick={(e) => {
+                // Close modal when clicking on backdrop
+                if (e.target === e.currentTarget) {
+                    onClose();
+                }
+            }}
+        >
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col animate-[fadeInZoom_0.2s_ease-in-out] my-auto">
+                <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
                     <h3 className="text-lg font-semibold text-gray-800">
                         Log for {date}
                     </h3>
@@ -130,7 +148,8 @@ export const EntryModal = ({ isOpen, onClose, onSave, date, existingEntry }: Ent
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                    <div className="p-6 space-y-6 overflow-y-auto flex-1">
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">Intensity (0-10)</label>
                         <div className="flex flex-wrap gap-2">
@@ -289,10 +308,11 @@ export const EntryModal = ({ isOpen, onClose, onSave, date, existingEntry }: Ent
                         />
                     </div>
 
-                    <div className="flex justify-end pt-2">
+                    </div>
+                    <div className="p-6 pt-4 border-t flex justify-end flex-shrink-0 bg-white">
                         <button
                             type="submit"
-                            className="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm active:scale-95"
+                            className="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm active:scale-95 w-full sm:w-auto"
                         >
                             Save Entry
                         </button>
