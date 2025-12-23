@@ -41,21 +41,35 @@ export const DayCell: React.FC<DayCellProps> = ({ day, date, entry, onClick, isT
                         Lvl {intensity}
                     </span>
                 )}
-                {entry?.medicationCount && entry.medicationCount > 0 && (
-                    <div 
-                        className="flex flex-row items-center justify-center gap-0.5"
-                        title={`${entry.medicationCount} píldora${entry.medicationCount > 1 ? 's' : ''}`}
-                    >
-                        {entry.medicationCount === 1 ? (
-                            <span className="text-sm">💊</span>
-                        ) : (
-                            <>
+                <div className="flex flex-col items-end gap-0.5">
+                    {entry?.medicationCount && entry.medicationCount > 0 && (
+                        <div 
+                            className="flex flex-row items-center justify-center gap-0.5"
+                            title={`${entry.medicationCount} píldora${entry.medicationCount > 1 ? 's' : ''}`}
+                        >
+                            {entry.medicationCount === 1 ? (
                                 <span className="text-sm">💊</span>
-                                <span className="text-sm">💊</span>
-                            </>
-                        )}
-                    </div>
-                )}
+                            ) : (
+                                <>
+                                    <span className="text-sm">💊</span>
+                                    <span className="text-sm">💊</span>
+                                </>
+                            )}
+                        </div>
+                    )}
+                    {(entry?.toothPain || entry?.goodSleep || entry?.period || entry?.hydration || entry?.caffeine || entry?.exercise || entry?.stress || entry?.weather) && (
+                        <div className="flex flex-row items-center gap-0.5 flex-wrap justify-end">
+                            {entry.toothPain && <span className="text-xs" title="Dolor de dientes">🦷</span>}
+                            {entry.goodSleep && <span className="text-xs" title="Durmió bien">🛏️</span>}
+                            {entry.period && <span className="text-xs" title="Menstruación">🩸</span>}
+                            {entry.hydration && <span className="text-xs" title="Hidratación">💧</span>}
+                            {entry.caffeine && <span className="text-xs" title="Cafeína">☕</span>}
+                            {entry.exercise && <span className="text-xs" title="Ejercicio">🏃</span>}
+                            {entry.stress && <span className="text-xs" title="Estrés">😰</span>}
+                            {entry.weather && <span className="text-xs" title="Cambios de clima">🌤️</span>}
+                        </div>
+                    )}
+                </div>
             </div>
         </button>
     );

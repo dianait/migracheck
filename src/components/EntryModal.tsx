@@ -15,6 +15,14 @@ export const EntryModal: React.FC<EntryModalProps> = ({ isOpen, onClose, onSave,
     const [intensity, setIntensity] = useState<Intensity>(0);
     const [notes, setNotes] = useState('');
     const [medicationCount, setMedicationCount] = useState<number>(0);
+    const [toothPain, setToothPain] = useState<boolean>(false);
+    const [goodSleep, setGoodSleep] = useState<boolean>(false);
+    const [period, setPeriod] = useState<boolean>(false);
+    const [hydration, setHydration] = useState<boolean>(false);
+    const [caffeine, setCaffeine] = useState<boolean>(false);
+    const [exercise, setExercise] = useState<boolean>(false);
+    const [stress, setStress] = useState<boolean>(false);
+    const [weather, setWeather] = useState<boolean>(false);
 
     // Reset state when modal opens or entry changes
     useEffect(() => {
@@ -22,6 +30,14 @@ export const EntryModal: React.FC<EntryModalProps> = ({ isOpen, onClose, onSave,
             setIntensity(existingEntry?.intensity ?? 0);
             setNotes(existingEntry?.notes ?? '');
             setMedicationCount(existingEntry?.medicationCount ?? 0);
+            setToothPain(existingEntry?.toothPain ?? false);
+            setGoodSleep(existingEntry?.goodSleep ?? false);
+            setPeriod(existingEntry?.period ?? false);
+            setHydration(existingEntry?.hydration ?? false);
+            setCaffeine(existingEntry?.caffeine ?? false);
+            setExercise(existingEntry?.exercise ?? false);
+            setStress(existingEntry?.stress ?? false);
+            setWeather(existingEntry?.weather ?? false);
         }
     }, [isOpen, existingEntry]);
 
@@ -29,7 +45,20 @@ export const EntryModal: React.FC<EntryModalProps> = ({ isOpen, onClose, onSave,
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ date, intensity, notes, medicationCount: medicationCount > 0 ? medicationCount : undefined });
+        onSave({ 
+            date, 
+            intensity, 
+            notes, 
+            medicationCount: medicationCount > 0 ? medicationCount : undefined,
+            toothPain: toothPain || undefined,
+            goodSleep: goodSleep || undefined,
+            period: period || undefined,
+            hydration: hydration || undefined,
+            caffeine: caffeine || undefined,
+            exercise: exercise || undefined,
+            stress: stress || undefined,
+            weather: weather || undefined,
+        });
         onClose();
     };
 
@@ -88,6 +117,108 @@ export const EntryModal: React.FC<EntryModalProps> = ({ isOpen, onClose, onSave,
                                     </button>
                                 ))}
                             </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Otros indicadores</label>
+                        <div className="grid grid-cols-3 gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setToothPain(!toothPain)}
+                                className={`p-3 rounded-lg border-2 transition-all duration-150 flex flex-col items-center justify-center gap-1 ${
+                                    toothPain 
+                                        ? 'bg-red-50 border-red-400 text-red-700 shadow-sm' 
+                                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                }`}
+                            >
+                                <span className="text-xl">🦷</span>
+                                <span className="text-xs font-medium">Dientes</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setGoodSleep(!goodSleep)}
+                                className={`p-3 rounded-lg border-2 transition-all duration-150 flex flex-col items-center justify-center gap-1 ${
+                                    goodSleep 
+                                        ? 'bg-green-50 border-green-400 text-green-700 shadow-sm' 
+                                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                }`}
+                            >
+                                <span className="text-xl">🛏️</span>
+                                <span className="text-xs font-medium">Sueño</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setPeriod(!period)}
+                                className={`p-3 rounded-lg border-2 transition-all duration-150 flex flex-col items-center justify-center gap-1 ${
+                                    period 
+                                        ? 'bg-pink-50 border-pink-400 text-pink-700 shadow-sm' 
+                                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                }`}
+                            >
+                                <span className="text-xl">🩸</span>
+                                <span className="text-xs font-medium">Regla</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setHydration(!hydration)}
+                                className={`p-3 rounded-lg border-2 transition-all duration-150 flex flex-col items-center justify-center gap-1 ${
+                                    hydration 
+                                        ? 'bg-blue-50 border-blue-400 text-blue-700 shadow-sm' 
+                                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                }`}
+                            >
+                                <span className="text-xl">💧</span>
+                                <span className="text-xs font-medium">Agua</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCaffeine(!caffeine)}
+                                className={`p-3 rounded-lg border-2 transition-all duration-150 flex flex-col items-center justify-center gap-1 ${
+                                    caffeine 
+                                        ? 'bg-amber-50 border-amber-400 text-amber-700 shadow-sm' 
+                                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                }`}
+                            >
+                                <span className="text-xl">☕</span>
+                                <span className="text-xs font-medium">Café</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setExercise(!exercise)}
+                                className={`p-3 rounded-lg border-2 transition-all duration-150 flex flex-col items-center justify-center gap-1 ${
+                                    exercise 
+                                        ? 'bg-purple-50 border-purple-400 text-purple-700 shadow-sm' 
+                                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                }`}
+                            >
+                                <span className="text-xl">🏃</span>
+                                <span className="text-xs font-medium">Ejercicio</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setStress(!stress)}
+                                className={`p-3 rounded-lg border-2 transition-all duration-150 flex flex-col items-center justify-center gap-1 ${
+                                    stress 
+                                        ? 'bg-orange-50 border-orange-400 text-orange-700 shadow-sm' 
+                                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                }`}
+                            >
+                                <span className="text-xl">😰</span>
+                                <span className="text-xs font-medium">Estrés</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setWeather(!weather)}
+                                className={`p-3 rounded-lg border-2 transition-all duration-150 flex flex-col items-center justify-center gap-1 ${
+                                    weather 
+                                        ? 'bg-cyan-50 border-cyan-400 text-cyan-700 shadow-sm' 
+                                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                }`}
+                            >
+                                <span className="text-xl">🌤️</span>
+                                <span className="text-xs font-medium">Clima</span>
+                            </button>
                         </div>
                     </div>
 

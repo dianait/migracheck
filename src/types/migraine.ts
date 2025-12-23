@@ -6,6 +6,14 @@ export interface MigraineEntry {
     intensity: Intensity;
     notes?: string;
     medicationCount?: number; // Número de píldoras tomadas (0, 1, 2, etc.)
+    toothPain?: boolean; // 🦷 Dolor de dientes
+    goodSleep?: boolean; // 🛏️ Durmió bien
+    period?: boolean; // 🩸 Menstruación
+    hydration?: boolean; // 💧 Hidratación adecuada
+    caffeine?: boolean; // ☕ Consumió cafeína
+    exercise?: boolean; // 🏃 Hizo ejercicio
+    stress?: boolean; // 😰 Estrés
+    weather?: boolean; // 🌤️ Cambios de clima/presión
 }
 
 export interface MigraineState {
