@@ -45,7 +45,7 @@ export const DayCell: React.FC<DayCellProps> = ({ day, date, entry, onClick, isT
                     {entry?.medicationCount && entry.medicationCount > 0 && (
                         <div 
                             className="flex flex-row items-center justify-center gap-0.5"
-                            title={`${entry.medicationCount} píldora${entry.medicationCount > 1 ? 's' : ''}`}
+                            title={`${entry.medicationCount} pill${entry.medicationCount > 1 ? 's' : ''}`}
                         >
                             {entry.medicationCount === 1 ? (
                                 <span className="text-sm">💊</span>
@@ -59,14 +59,14 @@ export const DayCell: React.FC<DayCellProps> = ({ day, date, entry, onClick, isT
                     )}
                     {(entry?.toothPain || entry?.goodSleep || entry?.period || entry?.hydration || entry?.caffeine || entry?.exercise || entry?.stress || entry?.weather) && (
                         <div className="flex flex-row items-center gap-0.5 flex-wrap justify-end">
-                            {entry.toothPain && <span className="text-xs" title="Dolor de dientes">🦷</span>}
-                            {entry.goodSleep && <span className="text-xs" title="Durmió bien">🛏️</span>}
-                            {entry.period && <span className="text-xs" title="Menstruación">🩸</span>}
-                            {entry.hydration && <span className="text-xs" title="Hidratación">💧</span>}
-                            {entry.caffeine && <span className="text-xs" title="Cafeína">☕</span>}
-                            {entry.exercise && <span className="text-xs" title="Ejercicio">🏃</span>}
-                            {entry.stress && <span className="text-xs" title="Estrés">😰</span>}
-                            {entry.weather && <span className="text-xs" title="Cambios de clima">🌤️</span>}
+                            {entry.toothPain && <span className="text-xs" title="Tooth pain">🦷</span>}
+                            {entry.goodSleep && <span className="text-xs" title="Good sleep">🛏️</span>}
+                            {entry.period && <span className="text-xs" title="Period">🩸</span>}
+                            {entry.hydration && <span className="text-xs" title="Hydration">💧</span>}
+                            {entry.caffeine && <span className="text-xs" title="Caffeine">☕</span>}
+                            {entry.exercise && <span className="text-xs" title="Exercise">🏃</span>}
+                            {entry.stress && <span className="text-xs" title="Stress">😰</span>}
+                            {entry.weather && <span className="text-xs" title="Weather changes">🌤️</span>}
                         </div>
                     )}
                 </div>

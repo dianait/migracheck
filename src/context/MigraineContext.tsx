@@ -1,9 +1,31 @@
-import { createContext, useReducer, type ReactNode, type Dispatch } from 'react';
+import { createContext, useReducer, useEffect, type ReactNode, type Dispatch } from 'react';
 import { type MigraineState, type MigraineAction } from '../types/migraine';
 
-export const initialState: MigraineState = {
-    entries: {},
-};
+const STORAGE_KEY = 'migracheck-entries';
+
+// Función para cargar el estado desde localStorage
+function loadStateFromStorage(): MigraineState {
+    try {
+        const storedData = localStorage.getItem(STORAGE_KEY);
+        if (storedData) {
+            return JSON.parse(storedData);
+        }
+    } catch (error) {
+        console.error('Error loading state from localStorage:', error);
+    }
+    return { entries: {} };
+}
+
+// Función para guardar el estado en localStorage
+function saveStateToStorage(state: MigraineState): void {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+        console.error('Error saving state to localStorage:', error);
+    }
+}
+
+export const initialState: MigraineState = loadStateFromStorage();
 
 export function migraineReducer(state: MigraineState, action: MigraineAction): MigraineState {
     switch (action.type) {
@@ -36,6 +58,11 @@ export const MigraineContext = createContext<{
 
 export const MigraineProvider = ({ children }: { children: ReactNode }) => {
     const [state, dispatch] = useReducer(migraineReducer, initialState);
+
+    // Guardar en localStorage cada vez que el estado cambie
+    useEffect(() => {
+        saveStateToStorage(state);
+    }, [state]);
 
     return (
         <MigraineContext.Provider value={{ state, dispatch }}>

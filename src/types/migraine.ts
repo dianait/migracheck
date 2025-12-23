@@ -5,15 +5,15 @@ export interface MigraineEntry {
     date: string; // ISO date string YYYY-MM-DD
     intensity: Intensity;
     notes?: string;
-    medicationCount?: number; // Número de píldoras tomadas (0, 1, 2, etc.)
-    toothPain?: boolean; // 🦷 Dolor de dientes
-    goodSleep?: boolean; // 🛏️ Durmió bien
-    period?: boolean; // 🩸 Menstruación
-    hydration?: boolean; // 💧 Hidratación adecuada
-    caffeine?: boolean; // ☕ Consumió cafeína
-    exercise?: boolean; // 🏃 Hizo ejercicio
-    stress?: boolean; // 😰 Estrés
-    weather?: boolean; // 🌤️ Cambios de clima/presión
+    medicationCount?: number; // Number of pills taken (0, 1, 2, etc.)
+    toothPain?: boolean; // 🦷 Tooth pain
+    goodSleep?: boolean; // 🛏️ Good sleep
+    period?: boolean; // 🩸 Menstruation
+    hydration?: boolean; // 💧 Adequate hydration
+    caffeine?: boolean; // ☕ Caffeine consumed
+    exercise?: boolean; // 🏃 Exercise
+    stress?: boolean; // 😰 Stress
+    weather?: boolean; // 🌤️ Weather/pressure changes
 }
 
 export interface MigraineState {

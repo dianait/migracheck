@@ -11,6 +11,8 @@ interface CalendarProps {
 export const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     const { state } = useContext(MigraineContext);
     const [currentDate, setCurrentDate] = useState(new Date());
+    const today = new Date();
+    const currentMonthStart = startOfMonth(today);
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
@@ -25,6 +27,9 @@ export const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
     const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
     const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
 
+    // Check if we're in the current month or a future month
+    const isCurrentOrFutureMonth = isSameMonth(currentDate, today) || currentDate > today;
+
     return (
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 animate-[fadeIn_0.5s_ease-in-out]">
             <div className="flex items-center justify-between mb-8 px-2">
@@ -32,10 +37,21 @@ export const Calendar: React.FC<CalendarProps> = ({ onDayClick }) => {
                     {format(currentDate, 'MMMM yyyy')}
                 </h2>
                 <div className="flex items-center space-x-2 bg-gray-50 rounded-full p-1">
-                    <button onClick={prevMonth} className="p-2 rounded-full hover:bg-white hover:shadow-sm text-gray-600 transition-all duration-200">
+                    <button 
+                        onClick={prevMonth} 
+                        className="p-2 rounded-full hover:bg-white hover:shadow-sm text-gray-600 transition-all duration-200"
+                    >
                         <ChevronLeft className="w-5 h-5" />
                     </button>
-                    <button onClick={nextMonth} className="p-2 rounded-full hover:bg-white hover:shadow-sm text-gray-600 transition-all duration-200">
+                    <button 
+                        onClick={nextMonth} 
+                        disabled={isCurrentOrFutureMonth}
+                        className={`p-2 rounded-full transition-all duration-200 ${
+                            isCurrentOrFutureMonth 
+                                ? 'text-gray-300 cursor-not-allowed opacity-50' 
+                                : 'hover:bg-white hover:shadow-sm text-gray-600'
+                        }`}
+                    >
                         <ChevronRight className="w-5 h-5" />
                     </button>
                 </div>
